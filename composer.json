@@ -1,0 +1,6 @@
+{
+    "require": {
+        "symfony/http-foundation": "~2.2",
+        "symfony/routing": "~2.2"
+    }
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            html, body {
+                height: 100%;
+            }
+            .box {
+                position: relative;
+                height: 100%;
+            }
+            #square {
+                position: absolute;
+                width: 200px;
+                height: 200px;
+                top: 50%;
+                left: 50%;
+                background-color: purple;
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <span id="mx"></span>
+            <span id="my"></span>
+            <span id="kx"></span>
+        </header>
+        <div class="box">
+            <div id="square"></div>
+        </div>
+        <script>
+            var sprite;
+            var moveSpeed = 50;
+            var mx = document.getElementById('mx');
+            var my = document.getElementById('my');
+            var kx = document.getElementById('kx');
+            var KEYS = {
+                LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40,
+                ENTER: 13, BACK: 8, ESC: 27
+            };
+            function keyboard(event){
+                kx.textContent = "KEY: " + event.keyCode;
+                switch(event.keyCode){
+                    case KEYS.LEFT: break;
+                    case KEYS.RIGHT: break;
+                }
+                //Stop browser from usual behavior.
+                event.preventDefault();
+                return false;
+            }
+            var lastx = Number.MIN_VALUE;
+            var lasty = Number.MIN_VALUE;
+            /**
+             * Need to capture movement,
+             * not absolute coords.
+             */
+            var diffx = 0;
+            var diffy = 0;
+            function mouseMove(event){
+                if(lastx === Number.MIN_VALUE){
+                    lastx = event.clientX;
+                    lasty = event.clientY;
+                }
+                
+                diffx = event.clientX - lastx;
+                diffy = event.clientY - lasty;
+                mx.textContent = " dX: " + diffx;
+                my.textContent = " dY: " + diffy;
+                
+                //update last
+                lastx = event.clientX;
+                lasty = event.clientY;
+                return false;
+            }
+            function mouseUp(event){
+                
+            }
+            
+            var posx = 0, posy = 0;
+            var now, delta;
+            var lasttime = window.performance.now();
+            var modifier;
+            var stopToken;
+            function render(){
+                now = window.performance.now();
+                modifier = 1;
+                //cap at 1 sec in case focus lost for awhile
+                delta = Math.min(1, (now - lasttime) / 1000);
+                //use it
+                if(diffx !== 0){
+                    if(diffx < 0) modifier = -1;
+                    posx = posx + (delta * moveSpeed * modifier);
+                    diffx = 0;
+                }
+                modifier = 1;
+                if(diffy !== 0){
+                    if(diffy < 0) modifier = -1;
+                    posy = posy + (delta * moveSpeed * modifier);
+                    diffy = 0;
+                }
+                //sprite.style.left = posx + 'px';
+                //sprite.style.top = posy + 'px';
+                moveBox(posx, posy);
+                lasttime = now;
+                stopToken = requestAnimationFrame(render);
+            }
+            function pause(){
+                window.cancelAnimationFrame(stopToken);
+            }
+            function moveBox(dx, dy){
+                sprite.style.left = dx + 'px';
+                sprite.style.top = dy + 'px';
+            }
+            function init(){
+                sprite = document.getElementById('square');
+                posx = parseInt(sprite.offsetLeft, 10);
+                posy = parseInt(sprite.offsetTop, 10);
+                sprite.style.position = 'absolute';
+                sprite.style.left = posx + 'px';
+                sprite.style.top = posy + 'py';
+                
+                render();
+            }
+            
+            document.addEventListener('mousemove', mouseMove, false);
+            document.addEventListener('keydown', keyboard, false);
+            window.addEventListener('load', init, false);
+        </script>
+    </body>
+</html>
